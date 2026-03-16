@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Unit Converter</title>
+    <style>
+        /* Basic styling to replicate the wireframe structure */
+        body { font-family: sans-serif; display: flex; justify-content: center; margin-top: 50px; }
+        .converter-container { border: 3px solid #333; border-radius: 8px; padding: 30px; width: 400px; }
+        .title { margin-top: 0; font-size: 28px; }
+
+        /* Navigation Tabs */
+        .tabs { margin-bottom: 30px; }
+        .tabs a { text-decoration: none; color: #333; font-weight: bold; margin-right: 20px; font-size: 18px; }
+        .tabs a.active { color: #4285f4; border-bottom: 3px solid #4285f4; padding-bottom: 4px; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 10px; border: 2px solid #333; border-radius: 6px; box-sizing: border-box; font-size: 16px;
+        }
+
+        /* Buttons */
+        .action-btn {
+            background: white; border: 2px solid #333; border-radius: 6px; padding: 10px 25px;
+            font-weight: bold; font-size: 16px; cursor: pointer; color: #333; text-decoration: none; display: inline-block;
+        }
+        .action-btn:hover { background: #f0f0f0; }
+
+        /* Results */
+        .result-text { font-size: 16px; font-weight: bold; margin-bottom: 10px; }
+        .result-value { font-size: 32px; font-weight: bold; margin-top: 0; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="converter-container">
+    <h1 class="title">Unit Converter</h1>
+
+    <div class="tabs">
+        <a th:href="@{/}" th:classappend="${activeTab == 'length'} ? 'active' : ''">Length</a>
+        <a th:href="@{/weight}" th:classappend="${activeTab == 'weight'} ? 'active' : ''">Weight</a>
+        <a th:href="@{/temperature}" th:classappend="${activeTab == 'temperature'} ? 'active' : ''">Temperature</a>
+    </div>
+
+    <div th:if="${request.result == null}">
+
+        <form th:action="@{/convert-{tab}(tab=${activeTab})}" th:object="${request}" method="post">
+
+            <div class="form-group">
+                <label>Enter the <span th:text="${activeTab}"></span> to convert</label>
+                <input type="number" step="any" th:field="*{value}" required />
+            </div>
+
+            <th:block th:if="${activeTab == 'length'}">
+                <div class="form-group">
+                    <label>Unit to Convert from</label>
+                    <select th:field="*{fromUnit}">
+                        <option value="meter">Meter</option>
+                        <option value="millimeter">Millimeter</option>
+                        <option value="centimeter">Centimeter</option>
+                        <option value="kilometer">Kilometer</option>
+                        <option value="inch">Inch</option>
+                        <option value="ft">Foot</option>
+                        <option value="yard">Yard</option>
+                        <option value="mile">Mile</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unit to Convert to</label>
+                    <select th:field="*{toUnit}">
+                        <option value="meter">Meter</option>
+                        <option value="millimeter">Millimeter</option>
+                        <option value="centimeter">Centimeter</option>
+                        <option value="kilometer">Kilometer</option>
+                        <option value="inch">Inch</option>
+                        <option value="ft">Foot</option>
+                        <option value="yard">Yard</option>
+                        <option value="mile">Mile</option>
+                    </select>
+                </div>
+            </th:block>
+
+            <th:block th:if="${activeTab == 'weight'}">
+                <div class="form-group">
+                    <label>Unit to Convert from</label>
+                    <select th:field="*{fromUnit}">
+                        <option value="gram">Gram</option>
+                        <option value="milligram">Milligram</option>
+                        <option value="kilogram">Kilogram</option>
+                        <option value="ounce">Ounce</option>
+                        <option value="pound">Pound</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unit to Convert to</label>
+                    <select th:field="*{toUnit}">
+                        <option value="gram">Gram</option>
+                        <option value="milligram">Milligram</option>
+                        <option value="kilogram">Kilogram</option>
+                        <option value="ounce">Ounce</option>
+                        <option value="pound">Pound</option>
+                    </select>
+                </div>
+            </th:block>
+
+            <th:block th:if="${activeTab == 'temperature'}">
+                <div class="form-group">
+                    <label>Unit to Convert from</label>
+                    <select th:field="*{fromUnit}">
+                        <option value="celsius">Celsius</option>
+                        <option value="fahrenheit">Fahrenheit</option>
+                        <option value="kelvin">Kelvin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unit to Convert to</label>
+                    <select th:field="*{toUnit}">
+                        <option value="celsius">Celsius</option>
+                        <option value="fahrenheit">Fahrenheit</option>
+                        <option value="kelvin">Kelvin</option>
+                    </select>
+                </div>
+            </th:block>
+
+            <button type="submit" class="action-btn">Convert</button>
+        </form>
+    </div>
+
+    <div th:unless="${request.result == null}">
+
+        <p class="result-text">Result of your calculation</p>
+
+        <p class="result-value">
+            <span th:text="${request.value}"></span> <span th:text="${request.fromUnit}"></span> =
+            <span th:text="${#numbers.formatDecimal(request.result, 1, 4)}"></span> <span th:text="${request.toUnit}"></span>
+        </p>
+
+        <a th:if="${activeTab == 'length'}" th:href="@{/}" class="action-btn">Reset</a>
+        <a th:if="${activeTab == 'weight'}" th:href="@{/weight}" class="action-btn">Reset</a>
+        <a th:if="${activeTab == 'temperature'}" th:href="@{/temperature}" class="action-btn">Reset</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
