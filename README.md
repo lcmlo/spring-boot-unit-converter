@@ -2,6 +2,8 @@
 
 A simple server-side rendered web application built with Java and Spring Boot that converts between different units of measurement. This project transitions from CLI-based applications to a web-based architecture, utilizing the MVC (Model-View-Controller) pattern.
 
+![converter](https://github.com/user-attachments/assets/3d08c2c8-fa1c-4a14-9441-96aeb4846b21)
+
 ## Tech Stack
 
 * **Java 21**
